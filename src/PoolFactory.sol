@@ -19,13 +19,15 @@ import {IERC20} from "forge-std/interfaces/IERC20.sol";
 
 contract PoolFactory {
     error PoolFactory__PoolAlreadyExists(address tokenAddress);
+
+    // @audit-info-written this error is not used
     error PoolFactory__PoolDoesNotExist(address tokenAddress);
 
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
-    mapping(address token => address pool) private s_pools;
-    mapping(address pool => address token) private s_tokens;
+    mapping(address token => address pool) private s_pools; // e probably poolToken -> pool
+    mapping(address pool => address token) private s_tokens; // e mapping back
 
     address private immutable i_wethToken;
 
@@ -38,20 +40,28 @@ contract PoolFactory {
                                FUNCTIONS
     //////////////////////////////////////////////////////////////*/
     constructor(address wethToken) {
+        // @audit-info-written lacking zero address check
         i_wethToken = wethToken;
     }
 
     /*//////////////////////////////////////////////////////////////
                            EXTERNAL FUNCTIONS
     //////////////////////////////////////////////////////////////*/
+
+    // e tokenAddress -> weth for a token <> weth pool
     function createPool(address tokenAddress) external returns (address) {
         if (s_pools[tokenAddress] != address(0)) {
             revert PoolFactory__PoolAlreadyExists(tokenAddress);
         }
+        // e "T-swap Dai"
+        // e weird ERC20 "what if the name function reverts"
         string memory liquidityTokenName = string.concat(
             "T-Swap ",
             IERC20(tokenAddress).name()
         );
+
+        // e "tsDAI"
+        // @audit-info-written this should be .symbol() not .name()
         string memory liquidityTokenSymbol = string.concat(
             "ts",
             IERC20(tokenAddress).name()

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.20;
 
-import {Test, console} from "forge-std/Test.sol";
-import {PoolFactory} from "../../src/PoolFactory.sol";
-import {ERC20Mock} from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
+import { Test, console } from "forge-std/Test.sol";
+import { PoolFactory } from "../../src/PoolFactory.sol";
+import { ERC20Mock } from "@openzeppelin/contracts/mocks/token/ERC20Mock.sol";
 
 contract PoolFactoryTest is Test {
     PoolFactory factory;
@@ -26,12 +26,7 @@ contract PoolFactoryTest is Test {
 
     function testCantCreatePoolIfExists() public {
         factory.createPool(address(tokenA));
-        vm.expectRevert(
-            abi.encodeWithSelector(
-                PoolFactory.PoolFactory__PoolAlreadyExists.selector,
-                address(tokenA)
-            )
-        );
+        vm.expectRevert(abi.encodeWithSelector(PoolFactory.PoolFactory__PoolAlreadyExists.selector, address(tokenA)));
         factory.createPool(address(tokenA));
     }
 }
